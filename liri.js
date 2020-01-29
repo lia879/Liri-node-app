@@ -1,265 +1,145 @@
 require("dotenv").config();
 
-Skip to content
-Search or jump to…
+var axios = require("axios");
+var moment = require("moment");
 
-Pull requests
-Issues
-Marketplace
-Explore
-
-
-
-0
-
-
-//vars
-
-
-// this is the import for the exporting files
+// connects to the keys.js file to retrieve api keys
 var keys = require("./keys.js");
-// used to access your keys information
-// var spotify = new Spotify(keys.spotify);
-// include the fs package for reading and writing packages
 var fs = require("fs");
-// include the request npm package (make sure to run npm install request in the terminal for this folder first or it will not run)
+var Spotify = require("node-spotify-api");
 var request = require("request");
-// omdbapi wrapper, npm install omdbapi
-var omdb = require("omdbapi");
-//var Spotify = require('spotify-web-api-node');
-var SpotifyPackage = require('node-spotify-api');
-// add moment
-const moment = require("moment");
-//creates log.txt file
-var filename = 'log.txt';
-console.log(filename);
 
-//return on dotenv to load up environment variables from .env file
-var dotEnv = require("dotenv").config();
-console.log(dotEnv);
+var spotify = new Spotify(keys.spotify);
 
-//argv[2] chooses users actions; argv[3] is input parameter, ie; movie title
-// process.argv will print out any command line arguments
-var userCommand = process.argv[2];
-var secondCommand = process.argv[3];
-
-//concatenate multiple words in 2nd user argument
-for (var i = 4; i < process.argv.length; i++) {
-    secondCommand += '+' + process.argv[i];
-}
-
-// Fetch Spotify Keys
-var spotify = new SpotifyPackage(keys.spotify);
-
-// Writes to the log.txt file
-var getArtistNames = function (artist) {
-    return artist.name;
-};
-
-// Function for running a Spotify search - Command is spotify-this-song
-var getSpotify = function (songName) {
-    if (songName === undefined) {
-        songName = "What's my age again";
-    }
-
-    spotify.search(
-        {
-            type: "track",
-            query: songName
-        },
-        function (err, data) {
-            if (err) {
-                console.log("Error occurred: " + err);
-                return;
-            }
-
-            var songs = data.tracks.items;
-
-            for (var i = 0; i < songs.length; i++) {
-                console.log(i);
-                console.log("artist(s): " + songs[i].artists.map(getArtistNames));
-                console.log("song name: " + songs[i].name);
-                console.log("preview song: " + songs[i].preview_url);
-                console.log("album: " + songs[i].album.name);
-                console.log("-----------------------------------");
-            }
-        }
-    );
-};
-
-//Switch command
-function mySwitch(userCommand) {
-
-    //choose which statement (userCommand) to switch to and execute
-    switch (userCommand) {
-
+var pickAppToRun = function (app, param) {
+    switch (app) {
         case "spotify-this-song":
-            getSpotify(secondCommand);
+            spotifySong(param);
             break;
-
         case "movie-this":
-            getMovie(secondCommand);
+            getMovie(param);
             break;
-
         case "concert-this":
-            getEvent(secondCommand);
+            getConcert(param);
             break;
-        case "artist-this":
-            getArtist(secondCommand);
-            break;
-
         case "do-what-it-says":
-            doWhat();
+            doWhatItSays();
             break;
+        default:
+            console.log("Usage is spotify-this-song, movie-this, concert-this, or do-what-it-says");
     }
 }
 
-//OMDB Movie - command: movie-this
-function getMovie() {
-    // OMDB Movie - this MOVIE base code is from class files, I have modified for more data and assigned parse.body to a Var
-    // grab the movieName which will always be the third node argument we just renammed it to secondCommand
-    var movieName = secondCommand;
-    // Then run a request to the OMDB API with the movie specified
-    // run a request to the OMDB API with the movie rot tomatoes rating specified
-    var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&tomatoes=true&apikey=trilogy";
+var runApp = function (argOne, argTwo) {
+    pickAppToRun(argOne, argTwo);
+};
 
-    // this line is just to help us debug against the actual URL
-    // console.log(queryURL);
+// process.argv[2] is the the case statements like "movie-this" or "spotify-this-song"
+// process.argv[3] is the mpvie title or song title
 
-    request(queryUrl, function (error, response, body) {
 
-        // If the request is successful = 200
-        // the response status code has to be 200 to run
-        if (!error && response.statusCode === 200) {
-
-            //Simultaneously output to console and log.txt via NPM simple-node-logger
-            // parse the body of the site and recover the title, release year, imdb rating, country, language, plot, actors, rotten tomatoes rating, and rotten tomatoes url
-            console.log('================ Movie Info ================');
-            console.log("Title: " + JSON.parse(body).Year);
-            console.log("Release Year: " + body.Year);
-            console.log("IMdB Rating: " + body.imdbRating);
-            console.log("Country: " + body.Country);
-            console.log("Language: " + body.Language);
-            console.log("Plot: " + body.Plot);
-            console.log("Actors: " + body.Actors);
-            // when i am trying to console.log the rating it is breaking the code in terminal and i am not sure how to fix it 
-            // console.log("Rotten Tomatoes Rating: " + body.Ratings[2].Value);
-            console.log("Rotten Tomatoes URL: " + body.tomatoURL);
-            console.log("================= THE END ==========");
-        } else {
-            //else - throw error
-            console.log("Error occurred.")
+var spotifySong = function (param) {
+    spotify.search({ type: 'track', query: param }, function (err, data) {
+        if (err) {
+            return console.log('Error occurred: ' + err);
         }
-        //Response if user does not type in a movie title
-        if (movieName === "The Secret Window") {
+        //console.log(data);
+        var songs = data.tracks.items;
+        // var songName = data.tracks.items.name;
+        // var artist = data.tracks.items.artists.name;
+        // var album = data.tracks.items.album.name;
+        // var previewURL = data.tracks.items.preview_url;
+
+
+
+        for (var i = 0; i < songs.length; i++) {
+            console.log(i);
+            console.log("Artist: " + songs[i].artists[0].name);
+            console.log("Song Name: " + songs[i].name);
+            console.log("Album: " + songs[i].album.name);
+            console.log("Preview on Spotify: " + songs[i].preview_url);
+            console.log("--------------------------------");
+        }
+    });
+}
+
+var getMovie = function (movieName) {
+    //example: https://www.omdbapi.com/?t=titanic&apikey=trilogy
+    request("http://www.omdbapi.com/?t=" + movieName + "&apikey=trilogy", function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+
+            var jsonData = JSON.parse(body);
+
+            console.log("Title: " + jsonData.Title);
+            console.log("Year of release: " + jsonData.Year);
+            console.log("IMDB Rating: " + jsonData.imdbRating);
+            console.log("Rotten Tomatoes Rating: " + jsonData.Ratings[2].Value);
+            console.log("Country: " + jsonData.Country);
+            console.log("Language: " + jsonData.Language);
+            console.log("Plot: " + jsonData.Plot);
+            console.log("Actors: " + jsonData.Actors);
+            console.log("------------------------------")
+        }
+    });
+}
+
+/*
+Name of the venue
+Venue location
+Date of the Event (use moment to format this as "MM/DD/YYYY")
+*/
+
+var getConcert = function (artist) {
+    //https://rest.bandsintown.com/artists/incubus/events?app_id=codingbootcamp
+    request("https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp", function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+
+            var jsonData = JSON.parse(body);
+
+            console.log("Venue: " + jsonData[0].venue.name);
+            console.log("Venue Location: " + jsonData[0].venue.city + ", " + jsonData[0].venue.region + ", " + jsonData[0].venue.country);
+            console.log("Event Date: " + moment(jsonData[0].datetime).format("MM-DD-YYYY"));
             console.log("-----------------------");
-            console.log("If you haven't watched 'The Secret Window,' then you should: https://www.imdb.com/title/tt0363988/?ref_=fn_al_tt_1");
-            console.log("It's on Netflix!");
         }
     });
 }
 
-//Function for command do-what-it-says; reads and splits random.txt file
-//command: do-what-it-says
-function doWhat() {
-    //Read random.txt file
-    // running the readFile module that's inside of fs
-    // stores the read information into the variable "data"
-    fs.readFile("random.txt", "utf8", function (error, data) {
-        if (!error);
-        console.log(data.toString());
-        //split text with comma delimiter
-        // break the string down by comma separation and store the contents into the output array
-        var cmds = data.toString().split(',');
-    });
-}
-
-
-// var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&tomatoes=true&apikey=trilogy";
-
-//Bands in Town - command: concert-this
-function getEvent() {
-    // following OMDB code 
-    var artistName = secondCommand;
-    // Then run a request to the Bands in town API with the event information 
-    var queryUrl = "https://rest.bandsintown.com/artists/" + artistName + "/events?app_id=c64e7377ddf9167af5426b26689ba3f7";
-
-    console.log(queryUrl);
-    request(queryUrl, function (error, response, body) {
-
-        // If the request is successful = 200
-        if (!error && response.statusCode === 200) {
-            var body = JSON.parse(body);
-
-            //Simultaneously output to console and log.txt via NPM simple-node-logger
-            console.log('================ Event Info ================');
-            console.log(body[0])
-            console.log('==================THE END=================');
-
-            //function that prints the parts of one item you want
-            // for loop that walks through each item of the array, and calls that function on it
-            for (var i = 0; i < body.length; i++) {
-                var event = body[i];
-                console.log(
-                    `Country: ${event.venue.country}
-City: ${event.venue.city}
-${4 + 4}`
-                )
-            }
-
-        } else {
-            //else - throw error
-            console.log("Error occurred.")
+var doWhatItSays = function () {
+    //read more about nodeJS readFile
+    //https://nodejs.org/api/fs.html#fs_fs_readfile_path_options_callback
+    fs.readFile('random.txt', 'utf8', function (err, data) {
+        if (err) {
+            return console.log(err);
+            //console.log(data);
         }
-        //Response if user does not type in an event title
-        if (artistName === "Taking Back Sunday") {
-            console.log("-----------------------");
-            console.log("If you haven't heard of them,' then you should");
-            console.log("It's on Youtube!");
+
+        // if a comma exists, split data by the comma and put into an array
+        var dataArr = data.split(',');
+
+        var app = dataArr[0];
+
+        if (dataArr[1]) {
+            var param = dataArr[1];
         }
-    });
-}
 
-https://rest.bandsintown.com/artists/u2?app_id=c64e7377ddf9167af5426b26689ba3f7
-function getArtist() {
-    // following OMDB code 
-    var artistName = secondCommand;
-    // Then run a request to the Bands in town API with the event information 
-    var queryUrl = "https://rest.bandsintown.com/artists/" + artistName + "?app_id=c64e7377ddf9167af5426b26689ba3f7";
-
-    console.log(queryUrl);
-    request(queryUrl, function (error, response, body) {
-
-        // If the request is successful = 200
-        if (!error && response.statusCode === 200) {
-            var body = JSON.parse(body);
-
-            //Simultaneously output to console and log.txt via NPM simple-node-logger
-            console.log('================ Event Info ================');
-            console.log("ID: " + body.id);
-            console.log("Name: " + body.name);
-            console.log("URL: " + body.url);
-            console.log("Image_URL: " + body.image_url);
-            console.log("Thumb_URL: " + body.thumb_url);
-            console.log("Facebook_Page_URL: " + body.facebook_page_url);
-            console.log('==================THE END=================');
-
-        } else {
-            //else - throw error
-            console.log("Error occurred.")
-        }
-        //Response if user does not type in an event title
-        if (artistName === "Taking Back Sunday") {
-            console.log("-----------------------");
-            console.log("If you haven't heard of them,' then you should");
-            console.log("It's on Youtube!");
+        switch (app) {
+            case "spotify-this-song":
+                spotifySong(param);
+                break;
+            case "movie-this":
+                getMovie(param);
+                break;
+            case "concert-this":
+                getConcert(param);
+                break;
+            case "do-what-it-says":
+                doWhatItSays();
+                break;
+            default:
+                console.log("Usage is spotify-this-song, movie-this, concert-this, or do-what-it-says");
         }
     });
 }
 
 
-//Closes mySwitch func - Everything except the call must be within this scope
-
-//Call mySwitch function
-mySwitch(userCommand);
-
+runApp(process.argv[2], process.argv.slice(3).join(" "));
