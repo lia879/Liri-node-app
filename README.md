@@ -45,13 +45,7 @@ This file will be used by the dotenv package to set what are known as environmen
 
 * concert-this
 * spotify-this-song
-
-        ![image](https://user-images.githubusercontent.com/54521457/73389110-1a7c3a80-4299-11ea-80eb-c3f5442f1883.png)
-
-
 * movie-this
-
-
 * do-what-it-says
 
 **What Each Command Should Do** 
@@ -61,15 +55,12 @@ This file will be used by the dotenv package to set what are known as environmen
 
     1. node liri.js concert-this <artist/band name here>
 
-        ex: node liri.js concert-this taylor swift
+        ex: node liri.js concert-this "taylor swift" 
 
     2. node liri.js spotify-this-song '<song name here>'
 
-        ex: node liri.js spotify-this-song "taylor swift" 
-        
-        ![image](https://user-images.githubusercontent.com/54521457/73389110-1a7c3a80-4299-11ea-80eb-c3f5442f1883.png)
-        
+        ex: node liri.js spotify-this-song "Kid Cudi" 
 
     3.node liri.js movie-this '<movie name here>'
 
-        ex: node liri.js movie-this guardian of the galaxy
+        ex: node liri.js movie-this "guardian of the galaxy"
