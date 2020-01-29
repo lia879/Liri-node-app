@@ -43,7 +43,8 @@ This file will be used by the dotenv package to set what are known as environmen
 
 **Make it so liri.js can take in one of the following commands:**
 
-* concert-this
+* concert-this - billie eilish 
+![image](https://user-images.githubusercontent.com/54521457/73389976-db4ee900-429a-11ea-9b5e-16d8f5def7de.png)
 * spotify-this-song
 * movie-this - john wick 
 ![image](https://user-images.githubusercontent.com/54521457/73389661-464bf000-429a-11ea-8dc8-93a7332e59a1.png)
