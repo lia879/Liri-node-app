@@ -59,7 +59,10 @@ This file will be used by the dotenv package to set what are known as environmen
 
     2. node liri.js spotify-this-song '<song name here>'
 
-        ex: node liri.js spotify-this-song k flay
+        ex: node liri.js spotify-this-song "taylor swift" 
+        
+        ![image](https://user-images.githubusercontent.com/54521457/73389110-1a7c3a80-4299-11ea-80eb-c3f5442f1883.png)
+        
 
     3.node liri.js movie-this '<movie name here>'
 
