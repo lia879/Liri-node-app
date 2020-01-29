@@ -51,7 +51,7 @@ This file will be used by the dotenv package to set what are known as environmen
 **What Each Command Should Do** 
 
 
-#How to run the program:
+# How to run the program:
 
     1. node liri.js concert-this <artist/band name here>
 
